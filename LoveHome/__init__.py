@@ -1,14 +1,14 @@
 # -*- coding:utf-8 -*-
 __author__ = 'xiaoguo'
 
-from flask import Flask, session
-from flask_sqlalchemy import SQLAlchemy
 import redis
-from flask_wtf.csrf import CSRFProtect
+from flask import Flask
 from flask_session import Session
-from config import config
-from index import api
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
 
+from LoveHome.api_1_0 import api
+from config import config
 
 # 创建SQLAlchemy的 db 对象
 db = SQLAlchemy()
