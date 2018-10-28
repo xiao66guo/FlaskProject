@@ -5,7 +5,7 @@ import redis
 
 # 当前应用程序的配置类
 class Config(object):
-    DEBUG = True
+
     SECRET_KEY = 'a39pOBTS06zJw7rK5+wq7uoD11WA7LWWGZyzYiE1ZxwV94P7NvWQGAaFGgX0p3Ih'
 
     # 数据库配置
@@ -26,5 +26,15 @@ class Config(object):
     # 设置session的过期时间
     PERMANENT_SESSION_LIFETIME = 86400 * 2
 
+
+class DevelopmentConfig(Config):
+    # 开发环境的配置
+    DEBUG = True
+
+
+class ProductionConfig(Config):
+    # 生产环境下的配置（线上）
+    # 数据库的配置
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:123456@localhost:3306/house'
 
 
