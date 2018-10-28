@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
 __author__ = 'xiaoguo'
 
+from LoveHome import create_app, db
 from flask_migrate import MigrateCommand, Migrate, Manager
-from LoveHome import app, db
 
-
+app = create_app('development')
 # 创建一个manager对象
 manager = Manager(app)
 # 将APP与数据库db进行关联
@@ -13,7 +13,7 @@ Migrate(app, db)
 manager.add_command('db', MigrateCommand)
 
 
-@app.route('/',methods=['get', 'post'])
+@app.route('/', methods=['get', 'post'])
 def index():
 
     return 'index222'

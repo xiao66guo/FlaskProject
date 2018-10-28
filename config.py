@@ -37,4 +37,7 @@ class ProductionConfig(Config):
     # 数据库的配置
     SQLALCHEMY_DATABASE_URI = 'mysql://root:123456@localhost:3306/house'
 
-
+config = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig
+}
