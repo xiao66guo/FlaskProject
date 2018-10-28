@@ -7,6 +7,7 @@ import redis
 from flask_wtf.csrf import CSRFProtect
 from flask_session import Session
 from config import config
+from index import api
 
 
 # 创建SQLAlchemy的 db 对象
@@ -26,6 +27,8 @@ def create_app(config_name):
     CSRFProtect(app)
     # 指定session的保存位置
     Session(app)
+    # 注册蓝图
+    app.register_blueprint(api)
 
     return app
 
