@@ -11,7 +11,11 @@ def get_html_file(file_name):
 
     if not file_name:
         file_name = 'index.html'
-    file_name = 'html/' + file_name
+
+    # 判断是否是图标，如果不是图标，拼接HTML
+    if file_name != 'favicon.ico':
+        file_name = 'html/' + file_name
+
     # send_static_file: 通过指定的文件名找到指定的静态文件并封装成响应
     return current_app.send_static_file(file_name)
 
