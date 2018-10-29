@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 __author__ = 'xiaoguo'
 
-from LoveHome import create_app, db
+from LoveHome import create_app, db, models
 from flask_migrate import MigrateCommand, Migrate, Manager
 
 app = create_app('development')
