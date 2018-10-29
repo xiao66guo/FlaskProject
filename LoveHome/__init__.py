@@ -7,6 +7,7 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from config import config
+from LoveHome.utils.common import RegexConverter
 
 
 # 创建SQLAlchemy的 db 对象
@@ -28,6 +29,10 @@ def create_app(config_name):
     CSRFProtect(app)
     # 指定session的保存位置
     Session(app)
+
+    # 添加正则路由转换器
+    app.url_map.converters['re'] = RegexConverter
+
     # 注册蓝图
     from LoveHome.api_1_0 import api
     app.register_blueprint(api)
