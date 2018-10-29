@@ -35,11 +35,10 @@ def create_app(config_name):
 
     # 注册蓝图
     from LoveHome.api_1_0 import api
-    app.register_blueprint(api)
+    app.register_blueprint(api, url_prefix='/api/v1.0')
 
     from LoveHome.web_html import html
     app.register_blueprint(html)
-
 
 
 
