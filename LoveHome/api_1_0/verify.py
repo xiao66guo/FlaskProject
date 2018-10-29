@@ -14,6 +14,8 @@ from LoveHome.utils.response_code import RET
 def get_image_code():
     # 1、取到图片验证码编码
     cur_id = request.args.get('cur_id')
+    pre_id = request.args.get('pre_id')
+
     if not cur_id:
         abort(403)
 
@@ -22,6 +24,8 @@ def get_image_code():
     # 3、将图片验证码的内容通过图片编码保存到redis中
     try:
         redis_store.set('ImageCode:'+cur_id, text, constants.IMAGE_CODE_REDIS_EXPIRES)
+        if pre_id:
+            redis_store.delete('ImageCode:'+pre_id)
     except Exception as e:
         print e
         return jsonify(errno=RET.DBERR, errmsg='存储图片验证码数据失败')
