@@ -2,6 +2,7 @@
 __author__ = 'xiaoguo'
 
 import redis
+import logging
 
 # 当前应用程序的配置类
 class Config(object):
@@ -26,16 +27,23 @@ class Config(object):
     # 设置session的过期时间
     PERMANENT_SESSION_LIFETIME = 86400 * 2
 
+    # 开发环境的日志等级为调试模式
+    LOGGING_LEVEL = logging.DEBUG
+
 
 class DevelopmentConfig(Config):
     # 开发环境的配置
     DEBUG = True
+    # # 开发环境的日志等级为调试模式
+    # LOGGING_LEVEL = logging.DEBUG
 
 
 class ProductionConfig(Config):
     # 生产环境下的配置（线上）
     # 数据库的配置
     SQLALCHEMY_DATABASE_URI = 'mysql://root:123456@localhost:3306/house'
+    # 生产环境下的日志等级为警告模式
+    LOGGING_LEVEL = logging.WARN
 
 config = {
     'development': DevelopmentConfig,
