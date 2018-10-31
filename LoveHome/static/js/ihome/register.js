@@ -58,6 +58,9 @@ function sendSMSCode() {
         url: '/api/v1.0/sms_code',
         type: 'post',
         data: JSON.stringify(params),
+        headers:{
+            'X-CSRFTOKEN': getCookie('csrf_token')
+        },
         contentType: 'application/json',
         success: function (resp) {
             if (resp.errno == '0'){
