@@ -7,7 +7,8 @@ from LoveHome.utils.captcha.captcha import captcha
 from flask import request, jsonify, make_response, abort, current_app, json
 from LoveHome import redis_store, constants
 from LoveHome.utils.response_code import RET
-import re
+import re, random
+from LoveHome.utils.sms import CCP
 
 
 '''短信验证码视图函数'''
@@ -45,8 +46,24 @@ def send_sms_code():
     if image_code.lower() != real_image_code.lower():
         return jsonify(errno=RET.DATAERR, errmsg='验证码输入不正确')
 
-    # TODO:5、如果前后的验证码比对一致，则可以发送短信验证码
-    return 'send successfully'
+    # 5、如果前后的验证码比对一致，则可以发送短信验证码
+    # 生成短信验证码
+    sms_code = '%06d' % random.randint(0, 999999)
+    current_app.logger.debug('短信验证码为：'+ sms_code)
+    # 6、发送短信验证码
+    result = CCP().send_templates_sms(mobile, [sms_code, constants.SMS_CODE_REDIS_EXPIRES/60], '1')
+    if result != 1:
+        # 发送失败
+        return jsonify(errno=RET.THIRDERR, errmsg='发送短信失败')
+    # 7、短信发送成功
+    try:
+        redis_store.set('Mobile' + mobile, sms_code, constants.SMS_CODE_REDIS_EXPIRES)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='保存验证码失败')
+
+    # 8、通知前端短信验证码发送成功
+    return jsonify(errno=RET.OK, errmsg='短信验证码发送成功')
 
 
 
@@ -62,6 +79,7 @@ def get_image_code():
 
     # 2、生成图片验证码
     name, text, image = captcha.generate_captcha()
+    current_app.logger.debug('图片验证码为：'+text)
     # 3、将图片验证码的内容通过图片编码保存到redis中
     try:
         redis_store.set('ImageCode:'+cur_id, text, constants.IMAGE_CODE_REDIS_EXPIRES)
