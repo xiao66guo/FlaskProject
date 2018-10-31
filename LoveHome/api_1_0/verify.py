@@ -50,12 +50,14 @@ def send_sms_code():
     # 生成短信验证码
     sms_code = '%06d' % random.randint(0, 999999)
     current_app.logger.debug('短信验证码为：'+ sms_code)
-    # 6、发送短信验证码
-    result = CCP().send_templates_sms(mobile, [sms_code, constants.SMS_CODE_REDIS_EXPIRES/60], '1')
-    if result != 1:
-        # 发送失败
-        return jsonify(errno=RET.THIRDERR, errmsg='发送短信失败')
-    # 7、短信发送成功
+    # 发送短信验证码测试
+    # # 6、发送短信验证码
+    # result = CCP().send_templates_sms(mobile, [sms_code, constants.SMS_CODE_REDIS_EXPIRES/60], '1')
+    # if result != 1:
+    #     # 发送失败
+    #     return jsonify(errno=RET.THIRDERR, errmsg='发送短信失败')
+
+    # 7、短信发送成功，保存到redis中
     try:
         redis_store.set('Mobile' + mobile, sms_code, constants.SMS_CODE_REDIS_EXPIRES)
     except Exception as e:

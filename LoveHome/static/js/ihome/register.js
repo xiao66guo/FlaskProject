@@ -47,7 +47,47 @@ function sendSMSCode() {
         return;
     }
 
-    // TODO: 通过ajax方式向后端接口发送请求，让后端发送短信验证码
+    // 通过ajax方式向后端接口发送请求，让后端发送短信验证码
+    var params = {
+        'mobile': mobile,
+        'image_code': imageCode,
+        'imageCode_id': imageCodeId
+    }
+
+    $.ajax({
+        url: '/api/v1.0/sms_code',
+        type: 'post',
+        data: JSON.stringify(params),
+        contentType: 'application/json',
+        success: function (resp) {
+            if (resp.errno == '0'){
+                // 表示发送成功，进入倒计时
+                var num = 60
+                var t = setInterval(function () {
+                    if (num == 0){
+                        // 表示倒计时完成,清除定时器
+                        clearInterval(t)
+                        // 重置验证码
+                        $(".phonecode-a").html('获取验证码')
+                        // 把点击事件重新添加
+                        $(".phonecode-a").attr("onclick", "sendSMSCode();");
+                    }else{
+                        // 表示正在倒计时，设置倒计时的秒数
+                        $(".phonecode-a").html(num + '秒')
+                    }
+                    num = num - 1
+                }, 1000)
+            }else {
+                // 添加点击事件
+                $(".phonecode-a").attr("onclick", "sendSMSCode();");
+                // 重新生成图片验证码
+                generateImageCode()
+                alert(resp.errmsg)
+            }
+        }
+    })
+
+
 }
 
 $(document).ready(function() {

@@ -28,7 +28,7 @@ softVersion = '2013-12-26'
 class CCP(object):
     def __new__(cls, *args, **kwargs):
         if not hasattr(cls, '_instance'):
-            cls._instance = super((CCP, cls).__new__(cls, *args, **kwargs))
+            cls._instance = super(CCP, cls).__new__(cls, *args, **kwargs)
 
             # 初始化REST SDK
             cls._instance.rest = REST(serverIP, serverPort, softVersion)
