@@ -42,13 +42,13 @@ def register():
     user.name = mobile
 
     # 5、存储user模型到数据库中
-    try:
-        db.session.add(user)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR, errmsg='保存用户数据失败')
+    # try:
+    #     db.session.add(user)
+    #     db.session.commit()
+    # except Exception as e:
+    #     db.session.rollback()
+    #     current_app.logger.error(e)
+    #     return jsonify(errno=RET.DBERR, errmsg='保存用户数据失败')
 
     # 6、返回数据
     return jsonify(errno=RET.OK, errmsg='注册成功')
