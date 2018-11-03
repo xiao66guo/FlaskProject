@@ -19,7 +19,7 @@ def upload_image(data):
         raise Exception('上传图片失败')
 
 
-if __name__ == '__main__':
-    file_name = raw_input('请输入图片地址：')
-    with open(file_name, 'rb') as f:
-        upload_image(f.read())
+# if __name__ == '__main__':
+#     file_name = raw_input('请输入图片地址：')
+#     with open(file_name, 'rb') as f:
+#         upload_image(f.read())

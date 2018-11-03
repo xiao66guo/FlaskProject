@@ -9,6 +9,42 @@ from LoveHome.utils.image_storage import upload_image
 from LoveHome import db, constants
 
 
+'''修改用户名'''
+@api.route('/user/name', methods=['POST'])
+def set_user_name():
+    # 1、获取传过来的用户名，并判断是否有值
+    user_name = request.json.get('name')
+    if not user_name:
+        return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
+
+    # 2、查询到当前用户
+    user_id = session.get('user_id')
+    try:
+        user = User.query.get(user_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询数据出错')
+
+    if not user:
+        return jsonify(errno=RET.NODATA, errmsg='当前用户不存在')
+
+    # 3、更新当前登录用户的模型
+    user.name = user_name
+
+    # 4、保存数据到数据库
+    try:
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(errno=RET.DBERR, errmsg='保存数据失败')
+
+    # 5、返回响应
+    return jsonify(errno=RET.OK, errmsg='保存成功')
+
+
+
+
 '''上传用户图像'''
 @api.route('/user/head_image', methods=['POST'])
 def upload_userImage():

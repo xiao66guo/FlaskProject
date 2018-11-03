@@ -24,7 +24,7 @@ $(document).ready(function () {
         }
     })
 
-    // TODO: 管理上传用户头像表单的行为
+    // 管理上传用户头像表单的行为
     $('#form-avatar').submit(function (e) {
         e.preventDefault()
         // 使用ajax模拟提交操作，会自动将表单中要提交的参数带上
@@ -46,6 +46,34 @@ $(document).ready(function () {
     })
 
     // TODO: 管理用户名修改的逻辑
+    $('#form-name').submit(function (e) {
+        e.preventDefault()
+        // 取用户输入的用户名
+        var name = $('#user-name').val()
+        if (!name){
+            $('.error-msg').show()
+            return
+        }
+        $('.error-msg').hide()
+        // 定义用户提交的参数
+        var params = {'name': name}
+        $.ajax({
+            url: '/api/v1.0/user/name',
+            type: 'post',
+            contentType: 'application/json',
+            headers: {
+                'X-CSRFTOKEN': getCookie('csrf_token')
+            },
+            data: JSON.stringify(params),
+            success:function (resp) {
+                if (resp.errno == '0'){
+                    showSuccessMsg()
+                }else{
+                    alert(resp.errmsg)
+                }
+            }
+        })
+    })
 
 })
 
