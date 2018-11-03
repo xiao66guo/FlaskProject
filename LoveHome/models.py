@@ -40,6 +40,15 @@ class User(BaseModel, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def to_dict(self):
+        resp = {
+            'name': self.name,
+            'avatar_url': self.avatar_url,
+            'mobile': self.mobile,
+            'user_id': self.id
+        }
+        return resp
+
 class Area(BaseModel, db.Model):
     """城区"""
 

@@ -23,11 +23,6 @@ def get_user_info():
         return jsonify(errno=RET.NODATA, errmsg='用户不存在')
 
     # 3、组织数据，进行返回
-    resp = {
-        'name': user.name,
-        'avatar_url': user.avatar_url,
-        'user_id': user.id
-    }
-    return jsonify(errno=RET.OK, errmsg='OK', data=resp)
+    return jsonify(errno=RET.OK, errmsg='OK', data=user.to_dict())
 
 
