@@ -17,7 +17,6 @@ def login():
     data_dict = request.json
     mobile = data_dict.get('mobile')
     password = data_dict.get('password')
-    print mobile
 
     # 2、校验参数
     if not all([mobile, password]):
@@ -76,6 +75,10 @@ def register():
     if phonecode != real_phonecode:
         return jsonify(errno=RET.DATAERR, errmsg='短信验证码输入错误')
 
+    # 判断手机号是否已经被注册
+    if User.query.filter(User.mobile == mobile).first():
+        return jsonify(errno=RET.PHONEEXISTS, errmsg='对不起，该手机号已被注册')
+
     # 4、初始化User模型，保存相关数据
     user = User()
     user.mobile = mobile
@@ -91,6 +94,11 @@ def register():
         db.session.rollback()
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg='保存用户数据失败')
+
+    # 保存用户信息到 session 中
+    session['user_id'] = user.id
+    session['name'] = user.name
+    session['mobile'] = user.mobile
 
     # 6、返回数据
     return jsonify(errno=RET.OK, errmsg='注册成功')
