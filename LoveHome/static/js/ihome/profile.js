@@ -12,7 +12,7 @@ function getCookie(name) {
 }
 
 $(document).ready(function () {
-    // TODO: 在页面加载完毕向后端查询用户的信息
+    // 在页面加载完毕向后端查询用户的信息
     $.get('/api/v1.0/user', function (resp) {
         if (resp.errno == '0'){
             // 设置头像地址
@@ -25,6 +25,25 @@ $(document).ready(function () {
     })
 
     // TODO: 管理上传用户头像表单的行为
+    $('#form-avatar').submit(function (e) {
+        e.preventDefault()
+        // 使用ajax模拟提交操作，会自动将表单中要提交的参数带上
+        $(this).ajaxSubmit({
+            url: '/api/v1.0/user/head_image',
+            type: 'post',
+            headers: {
+                'X-CSRFTOKEN': getCookie('csrf_token')
+            },
+            success: function (resp) {
+                if (resp.errno == '0'){
+                    // 显示头像
+                    $('#user-avatar').attr('src', resp.data.avatar_url)
+                }else{
+                    alert(resp.errmsg)
+                }
+            }
+        })
+    })
 
     // TODO: 管理用户名修改的逻辑
 

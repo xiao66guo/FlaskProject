@@ -43,7 +43,7 @@ class User(BaseModel, db.Model):
     def to_dict(self):
         resp = {
             'name': self.name,
-            'avatar_url': self.avatar_url,
+            'avatar_url': constants.QINIU_DOMIN_PREFIX + (self.avatar_url if self.avatar_url else ''),
             'mobile': self.mobile,
             'user_id': self.id
         }
