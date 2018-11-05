@@ -2,15 +2,17 @@
 __author__ = 'xiaoguo'
 
 from . import api
-from flask import session, current_app, jsonify, request
+from flask import session, current_app, jsonify, request, g
 from LoveHome.models import User
 from LoveHome.utils.response_code import RET
 from LoveHome.utils.image_storage import upload_image
 from LoveHome import db, constants
+from LoveHome.utils.common import login_required
 
 
 '''修改用户名'''
 @api.route('/user/name', methods=['POST'])
+@login_required
 def set_user_name():
     # 1、获取传过来的用户名，并判断是否有值
     user_name = request.json.get('name')
@@ -18,7 +20,8 @@ def set_user_name():
         return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
 
     # 2、查询到当前用户
-    user_id = session.get('user_id')
+    # user_id = session.get('user_id')
+    user_id = g.user_id
     try:
         user = User.query.get(user_id)
     except Exception as e:
@@ -47,6 +50,7 @@ def set_user_name():
 
 '''上传用户图像'''
 @api.route('/user/head_image', methods=['POST'])
+@login_required
 def upload_userImage():
     # 1、获取到上传的头像
     try:
@@ -63,7 +67,8 @@ def upload_userImage():
         return jsonify(errno=RET.THIRDERR, errmsg='上传图片失败')
 
     # 4、如果上传成功，将头像保存到用户表中的头像字段
-    user_id = session.get('user_id')
+    # user_id = session.get('user_id')
+    user_id = g.user_id
     try:
         user = User.query.get(user_id)
     except Exception as e:
@@ -91,11 +96,12 @@ def upload_userImage():
 
 '''获取用户信息'''
 @api.route('/user')
+@login_required
 def get_user_info():
 
     # 1、获取当前登录的用户ID
-    user_id = session.get('user_id')
-
+    # user_id = session.get('user_id')
+    user_id = g.user_id
     # 2、查询出指定的用户信息
     try:
         user = User.query.get(user_id)
