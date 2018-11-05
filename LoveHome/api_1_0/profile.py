@@ -10,6 +10,26 @@ from LoveHome import db, constants
 from LoveHome.utils.common import login_required
 
 
+'''获取用户实名认证信息'''
+@api.route('/user/auth', methods=['GET'])
+@login_required
+def get_user_auth():
+    # 1、查询当前用户的模型
+    user_id = g.user_id
+    try:
+        user = User.query.get(user_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
+
+    if not user:
+        return jsonify(errno=RET.NODATA, errmsg='用户不存在')
+
+    resp = {
+        'real_name': user.real_name,
+        'id_card': user.id_card
+    }
+    return jsonify(errno=RET.OK, errmsg='OK', data=resp)
 
 
 
