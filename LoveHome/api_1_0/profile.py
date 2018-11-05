@@ -10,6 +10,47 @@ from LoveHome import db, constants
 from LoveHome.utils.common import login_required
 
 
+
+
+
+'''用户实名认证功能'''
+@api.route('/user/auth', methods=['POST'])
+@login_required
+def set_user_auth():
+    # 1、获取用户的数据，并判断参数是否有值
+    data_dict = request.json
+    real_name = data_dict.get('real_name')
+    id_card = data_dict.get('id_card')
+
+    # 2、判断参数是否有值
+    if not all([real_name, id_card]):
+        return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
+    # 3、查询当前用户的模型
+    user_id = g.user_id
+    try:
+        user = User.query.get(user_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
+
+    if not user:
+        return jsonify(errno=RET.NODATA, errmsg='用户不存在')
+
+    # 4、更新模型
+    user.real_name = real_name
+    user.id_card = id_card
+
+    # 5、保存数据到数据库
+    try:
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(errno=RET.DBERR, errmsg='保存数据失败')
+
+    return jsonify(errno=RET.OK, errmsg='保存成功')
+
+
 '''修改用户名'''
 @api.route('/user/name', methods=['POST'])
 @login_required
@@ -44,8 +85,6 @@ def set_user_name():
 
     # 5、返回响应
     return jsonify(errno=RET.OK, errmsg='保存成功')
-
-
 
 
 '''上传用户图像'''
@@ -90,8 +129,6 @@ def upload_userImage():
     # 5、返回响应，附带头像地址
     avatar_url = constants.QINIU_DOMIN_PREFIX + key
     return jsonify(errno=RET.OK, errmsg='上传成功', data={'avatar_url': avatar_url})
-
-
 
 
 '''获取用户信息'''
