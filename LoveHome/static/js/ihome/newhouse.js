@@ -10,11 +10,15 @@ $(document).ready(function(){
     // 在页面加载完毕之后获取区域信息
     $.get('/api/v1.0/areas', function (resp) {
         if (resp.errno == '0'){
-            for (var i=0; i<resp.data.length; i++){
-                var aid = resp.data[i].aid
-                var aname = resp.data[i].aname
-                $('#area-id').append('<option value="' + aid + '">'+ aname +'</option>')
-            }
+            // for (var i=0; i<resp.data.length; i++){
+            //     var aid = resp.data[i].aid
+            //     var aname = resp.data[i].aname
+            //     $('#area-id').append('<option value="' + aid + '">'+ aname +'</option>')
+            // }
+            // 通过模板生成要显示的HTML
+            var html = template("areas-tmpl", {'areas': resp.data})
+            // 设置到指定的标签里面
+            $('#area-id').html(html)
 
         }else{
             alert(resp.errmsg)
