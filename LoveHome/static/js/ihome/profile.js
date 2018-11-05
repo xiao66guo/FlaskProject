@@ -19,6 +19,8 @@ $(document).ready(function () {
             $('#user-avatar').attr('src', resp.data.avatar_url)
             // 设置昵称
             $('#user-name').val(resp.data.name)
+        }else if(resp.errno == '4101'){  // 用户未登录时返回的错误状态码
+            location.href = '/'
         }else {
             alert(resp.errmsg)
         }
@@ -38,7 +40,9 @@ $(document).ready(function () {
                 if (resp.errno == '0'){
                     // 显示头像
                     $('#user-avatar').attr('src', resp.data.avatar_url)
-                }else{
+                }else if(resp.errno == '4101'){  // 用户未登录时返回的错误状态码
+                    location.href = '/'
+                }else {
                     alert(resp.errmsg)
                 }
             }
@@ -68,7 +72,9 @@ $(document).ready(function () {
             success:function (resp) {
                 if (resp.errno == '0'){
                     showSuccessMsg()
-                }else{
+                }else if(resp.errno == '4101'){  // 用户未登录时返回的错误状态码
+                    location.href = '/'
+                }else {
                     alert(resp.errmsg)
                 }
             }

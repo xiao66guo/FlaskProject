@@ -11,6 +11,17 @@ from LoveHome.models import User
 import re
 
 
+'''用户退出功能'''
+@api.route('/session', methods=['DELETE'])
+def logout():
+    session.pop('user_id')
+    session.pop('name')
+    session.pop('mobile')
+
+    return jsonify(errno=RET.OK, errmsg='OK')
+
+
+'''用户登录功能'''
 @api.route('/session', methods=['POST'])
 def login():
     # 1、获取参数
@@ -48,7 +59,7 @@ def login():
     return jsonify(errno=RET.OK, errmsg='登录成功')
 
 
-
+'''用户注册功能'''
 @api.route('/users', methods=['POST'])
 def register():
     # 1、获取参数：手机号、短信验证码、密码
