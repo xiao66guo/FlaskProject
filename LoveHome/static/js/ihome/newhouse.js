@@ -60,12 +60,34 @@ $(document).ready(function(){
                     $('#form-house-info').hide()
                     // 显示上传房屋图片的表单
                     $('#form-house-image').show()
+                    // 设置图片表单中要上传房屋的id
+                    $('#house-id').val(resp.data.house_id)
                 }
             }
         })
 
     })
 
-    // TODO: 处理图片表单的数据
+    // 处理图片表单的数据
+    $('#form-house-image').submit(function (e) {
+        // 阻止默认提交
+        e.preventDefault()
+        $(this).ajaxSubmit({
+            url: '/api/v1.0/house/image',
+            type: 'post',
+            headers: {
+                'X-CSRFTOKEN': getCookie('csrf_token')
+            },
+            success: function (resp) {
+                if (resp.errno == '0'){
+                    // 将上传成功的图片显示在界面上
+                    $('.house-image-cons').append('<img src="' + resp.data.image_url + '">')
+                }else{
+                    alert(resp.errmsg)
+                }
+            }
+        })
+        
+    })
 
 })
