@@ -44,6 +44,10 @@ def upload_house_image():
         current_app.logger.error(e)
         return jsonify(errno=RET.THIRDERR, errmsg='上传房屋图片失败')
 
+    # 判断当前房屋是否设置index_image_url,如果没有设置直接设置
+    if not house.index_image_url:
+        house.index_image_url = key
+
     # 4、初始化房屋图片的模型
     house_image_model = HouseImage()
 
@@ -61,8 +65,6 @@ def upload_house_image():
 
     # 6、返回图片数据
     return jsonify(errno=RET.OK, errmsg='房屋图片上传成功', data={'image_url': constants.QINIU_DOMIN_PREFIX + key})
-
-
 
 
 '''添加新房屋信息功能'''
