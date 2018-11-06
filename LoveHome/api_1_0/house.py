@@ -4,12 +4,34 @@ __author__ = 'xiaoguo'
 '''房屋相关的视图函数'''
 from LoveHome.api_1_0 import api
 from LoveHome.models import Area, House, Facility, HouseImage
-from flask import jsonify, current_app, request, g
+from flask import jsonify, current_app, request, g, session
 from LoveHome.utils.response_code import RET
 from LoveHome.utils.common import login_required
 from LoveHome import db, constants
 from LoveHome.utils import image_storage
 
+
+'''显示房屋详情信息'''
+@api.route('/houses/<int:house_id>')
+def get_house_detail(house_id):
+    # 1、通过房屋ID查询指定的房屋模型
+    try:
+        house = House.query.get(house_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
+    if not house:
+        return jsonify(RET.NODATA, errmsg='房屋不存在')
+    # 2、封装房屋字典信息
+    resp_dict = house.to_full_dict()
+    # 取到当前登录用户的ID，如果没有用户登录就返回-1
+    user_id = session.get('user_id', -1)
+
+    return jsonify(errno=RET.OK, errmsg='OK', data={'house': resp_dict, 'user_id': user_id})
+
+
+
+    return jsonify(errno=RET.OK, errmsg='OK')
 
 '''上传房屋图片功能'''
 @api.route('/house/image', methods=['POST'])
@@ -94,6 +116,8 @@ def add_house():
     try:
         # 以分的方式进行保存
         price = int(float(price) * 100)
+        deposit = int(float(deposit) * 100)
+
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
