@@ -14,9 +14,16 @@ from LoveHome.utils import image_storage
 '''搜索房屋功能'''
 @api.route('/houses')
 def search_houses():
-    current_app.logger.debug(request.args)
+    # current_app.logger.debug(request.args)
     aid = request.args.get('aid', '')
     sk = request.args.get('sk', 'new')      # new:最新上线   booking：入住最多  价格：price-des,price-inc
+    p = request.args.get('p', 1)
+    # 判断参数
+    try:
+        p = int(p)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
 
 
     # 查询所有房屋数据
@@ -35,7 +42,13 @@ def search_houses():
         else:
             house_query = house_query.order_by(House.create_time.desc())
 
-        houses = house_query.all()
+        # 设置分页功能
+        paginate = house_query.paginate(p, constants.HOUSE_LIST_PAGE_CAPACITY, False)
+        # 当前页的数据
+        houses = paginate.items
+        # 总页数
+        total_page = paginate.pages
+
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
@@ -45,7 +58,12 @@ def search_houses():
     for house in houses:
         houses_dict_list.append(house.to_basic_dict())
 
-    return jsonify(errno=RET.OK, errmsg='OK', data=houses_dict_list)
+    resp = {
+        'total_page': total_page,
+        'houses': houses_dict_list
+    }
+
+    return jsonify(errno=RET.OK, errmsg='OK', data=resp)
 
 
 
