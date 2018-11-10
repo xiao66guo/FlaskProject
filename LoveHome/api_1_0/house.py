@@ -11,6 +11,26 @@ from LoveHome import db, constants, redis_store
 from LoveHome.utils import image_storage
 
 
+'''搜索房屋功能'''
+@api.route('/houses')
+def search_houses():
+    # 查询所有房屋数据
+    try:
+        houses = House.query.all()
+    except Exception as e:
+        current_app.logger.error(e)
+
+    # 转成字典列表
+    houses_dict_list = []
+    for house in houses:
+        houses_dict_list.append(house.to_basic_dict())
+
+    return jsonify(errno=RET.OK, errmsg='OK', data=houses_dict_list)
+
+
+
+
+
 '''获取首页推荐房屋'''
 @api.route('/houses/index')
 def get_house_index():
@@ -25,9 +45,6 @@ def get_house_index():
         houses_dict_list.append(house.to_basic_dict())
 
     return jsonify(errno=RET.OK, errmsg='OK', data=houses_dict_list)
-
-
-
 
 
 '''显示房屋详情信息'''

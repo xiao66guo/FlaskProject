@@ -9,6 +9,7 @@ function centerModals(){
     });
 }
 
+
 function setStartDate() {
     var startDate = $("#start-date-input").val();
     if (startDate) {
@@ -34,6 +35,7 @@ function setStartDate() {
     $("#start-date-modal").modal("hide");
 }
 
+
 function setEndDate() {
     var endDate = $("#end-date-input").val();
     if (endDate) {
@@ -42,6 +44,7 @@ function setEndDate() {
     }
     $("#end-date-modal").modal("hide");
 }
+
 
 function goToSearchPage(th) {
     var url = "/search.html?";
@@ -56,6 +59,7 @@ function goToSearchPage(th) {
     url += ("ed=" + $(th).attr("end-date"));
     location.href = url;
 }
+
 
 $(document).ready(function(){
     // 检查用户的登录状态
@@ -74,7 +78,7 @@ $(document).ready(function(){
 
     // 获取幻灯片要展示的房屋基本信息
     $.get('/api/v1.0/houses/index', function (resp) {
-        html = template('swiper-houses-tmpl', {'houses': resp.data})
+        var html = template('swiper-houses-tmpl', {'houses': resp.data})
         $('.swiper-wrapper').html(html)
 
         // 设置幻灯片对象，开启幻灯片滚动

@@ -44,7 +44,17 @@ function updateHouseData(action) {
         sk:sortKey,
         p:next_page
     };
-    // TODO: 获取房屋列表信息
+    // 获取房屋列表信息
+    $.get('/api/v1.0/houses', params, function (resp) {
+        if (resp.errno == '0'){
+            var html = template('house-list-tmpl', {'houses': resp.data})
+            $('.house-list').html(html)
+        }else{
+
+        }
+    })
+
+
 }
 
 $(document).ready(function(){
@@ -66,6 +76,7 @@ $(document).ready(function(){
             if (areaId) {
                 for (var i=0; i<data.data.length; i++) {
                     areaId = parseInt(areaId);
+
                     if (data.data[i].aid == areaId) {
                         $(".filter-area").append('<li area-id="'+ data.data[i].aid+'" class="active">'+ data.data[i].aname+'</li>');
                     } else {
