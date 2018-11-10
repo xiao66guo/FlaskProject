@@ -11,6 +11,15 @@ from LoveHome.models import User
 import re
 
 
+'''判断用户是否登录，如果登录，返回用户的ID和用户名'''
+@api.route('/session')
+def check_user_login():
+    user_id = session.get('user_id')
+    name = session.get('name')
+
+    return jsonify(errno=RET.OK, errmsg='OK', data={'user_id': user_id, 'name': name})
+
+
 '''用户退出功能'''
 @api.route('/session', methods=['DELETE'])
 def logout():

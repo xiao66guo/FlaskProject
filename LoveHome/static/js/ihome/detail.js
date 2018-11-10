@@ -45,14 +45,4 @@ $(document).ready(function(){
             alert(resp.errmsg)
         }
     })
-
-
 })
-
-// 设置房屋详情数据
-            // $(".detail-con").html(template("house-detail-tmpl", {"house": resp.data.house}))
-            // if (resp.data.user_id != resp.data.house.user_id) {
-            //     // 显示预订按钮
-            //
-            //
-            // }

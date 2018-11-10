@@ -58,8 +58,21 @@ function goToSearchPage(th) {
 }
 
 $(document).ready(function(){
-    // TODO: 检查用户的登录状态
-    $(".top-bar>.register-login").show();
+    // 检查用户的登录状态
+    $.get('/api/v1.0/session', function (resp) {
+        // console.log(resp.data.name, resp.data.user_id)
+        if (resp.data.user_id && resp.data.name){
+            // 显示用户名标签
+            $(".top-bar>.user-info").show();
+            // 设置数据
+            console.log(resp.data.name)
+            $(".top-bar>.user-info>a").html(resp.data.name)
+        }else {      // 显示注册登录
+            $(".top-bar>.register-login").show();
+        }
+    })
+
+
     // TODO: 获取幻灯片要展示的房屋基本信息
 
     // TODO: 数据设置完毕后,需要设置幻灯片对象，开启幻灯片滚动
