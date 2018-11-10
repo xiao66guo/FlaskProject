@@ -33,13 +33,22 @@ def search_houses():
             start_date = datetime.datetime.strptime(sd, '%Y-%m-%d')
         if ed:
             end_date = datetime.datetime.strptime(ed, '%Y-%m-%d')
-        if start_date && end_date:
+        if start_date and end_date:
             assert start_date < end_date, Exception('结束日期必须大于开始日期')
 
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
 
+    # 从redis缓存中去取数据
+    try:
+        redis_name = 'house_list_%s_%s_%s_%s' % (aid, sk, sd, ed)
+        # 取出缓存中的值
+        resp = redis_store.hget(redis_name, p)
+        if resp:
+            return jsonify(errno=RET.OK, errmsg='OK', data=eval(resp))
+    except Exception as e:
+        current_app.logger.error(e)
 
     # 查询所有房屋数据
     try:
@@ -93,6 +102,23 @@ def search_houses():
         'total_page': total_page,
         'houses': houses_dict_list
     }
+
+    # 进行redis缓存
+    try:
+        redis_name = 'house_list_%s_%s_%s_%s' % (aid, sk, sd, ed)
+        # 获取redis中的管道对象
+        pipeline = redis_store.pipeline()
+        # 开启事务
+        pipeline.multi()
+        # 设置数据
+        pipeline.hset(redis_name, p, resp)
+        # 设置数据的过期时间
+        pipeline.expire(redis_name, constants.HOUSE_LIST_REDIS_EXPIRES)
+        # 提交事务
+        pipeline.execute()
+    except Exception as e:
+        current_app.logger.error(e)
+
 
     return jsonify(errno=RET.OK, errmsg='OK', data=resp)
 
