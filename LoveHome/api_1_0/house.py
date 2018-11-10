@@ -14,11 +14,31 @@ from LoveHome.utils import image_storage
 '''搜索房屋功能'''
 @api.route('/houses')
 def search_houses():
+    current_app.logger.debug(request.args)
+    aid = request.args.get('aid', '')
+    sk = request.args.get('sk', 'new')      # new:最新上线   booking：入住最多  价格：price-des,price-inc
+
+
     # 查询所有房屋数据
     try:
-        houses = House.query.all()
+        house_query = House.query
+        if aid:
+            house_query = house_query.filter(House.area_id == aid)
+
+        # 排序功能
+        if sk == 'booking':
+            house_query = house_query.order_by(House.order_count.desc())
+        elif sk == 'price-inc':
+            house_query = house_query.order_by(House.price.asc())
+        elif sk == 'price-des':
+            house_query = house_query.order_by(House.price.desc())
+        else:
+            house_query = house_query.order_by(House.create_time.desc())
+
+        houses = house_query.all()
     except Exception as e:
         current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
 
     # 转成字典列表
     houses_dict_list = []
