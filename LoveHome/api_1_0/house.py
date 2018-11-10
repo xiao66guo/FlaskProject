@@ -3,12 +3,13 @@ __author__ = 'xiaoguo'
 
 '''房屋相关的视图函数'''
 from LoveHome.api_1_0 import api
-from LoveHome.models import Area, House, Facility, HouseImage
+from LoveHome.models import Area, House, Facility, HouseImage, Order
 from flask import jsonify, current_app, request, g, session
 from LoveHome.utils.response_code import RET
 from LoveHome.utils.common import login_required
 from LoveHome import db, constants, redis_store
 from LoveHome.utils import image_storage
+import datetime
 
 
 '''搜索房屋功能'''
@@ -18,9 +19,23 @@ def search_houses():
     aid = request.args.get('aid', '')
     sk = request.args.get('sk', 'new')      # new:最新上线   booking：入住最多  价格：price-des,price-inc
     p = request.args.get('p', 1)
+    sd = request.args.get('sd', '')
+    ed = request.args.get('ed', '')
+
+    start_date = None
+    end_date =None
+
     # 判断参数
     try:
         p = int(p)
+        # 将字符串对象转换成时间对象
+        if sd:
+            start_date = datetime.datetime.strptime(sd, '%Y-%m-%d')
+        if ed:
+            end_date = datetime.datetime.strptime(ed, '%Y-%m-%d')
+        if start_date && end_date:
+            assert start_date < end_date, Exception('结束日期必须大于开始日期')
+
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
@@ -32,6 +47,21 @@ def search_houses():
         if aid:
             house_query = house_query.filter(House.area_id == aid)
 
+        conflict_orders_list = []
+        # 通过搜索时间去查询冲突的订单
+        if start_date and end_date:
+            conflict_orders_list = Order.query.filter(end_date > Order.begin_date, start_date < Order.end_date).all()
+        elif start_date:
+            conflict_orders_list = Order.query.filter(start_date < Order.end_date).all()
+        elif end_date:
+            conflict_orders_list = Order.query.filter(end_date > Order.begin_date).all()
+
+        if conflict_orders_list:
+            # 取出冲突订单中所有房屋的id
+            conflict_houses_ids = [Order.house_id for id in conflict_orders_list]
+            house_query = house_query.filter(House.id.notin_(conflict_houses_ids))
+
+
         # 排序功能
         if sk == 'booking':
             house_query = house_query.order_by(House.order_count.desc())
@@ -41,6 +71,7 @@ def search_houses():
             house_query = house_query.order_by(House.price.desc())
         else:
             house_query = house_query.order_by(House.create_time.desc())
+
 
         # 设置分页功能
         paginate = house_query.paginate(p, constants.HOUSE_LIST_PAGE_CAPACITY, False)
