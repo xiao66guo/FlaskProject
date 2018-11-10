@@ -11,6 +11,25 @@ from LoveHome import db, constants
 from LoveHome.utils import image_storage
 
 
+'''获取首页推荐房屋'''
+@api.route('/houses/index')
+def get_house_index():
+    try:
+        houses = House.query.order_by(House.create_time.desc()).limit(constants.HOME_PAGE_MAX_HOUSES)
+    except Exception as e:
+        current_app.logger.error(e)
+
+    houses_dict_list = []
+    # 遍历将房屋模型列表转换成字典
+    for house in houses:
+        houses_dict_list.append(house.to_basic_dict())
+
+    return jsonify(errno=RET.OK, errmsg='OK', data=houses_dict_list)
+
+
+
+
+
 '''显示房屋详情信息'''
 @api.route('/houses/<int:house_id>')
 def get_house_detail(house_id):
@@ -32,6 +51,7 @@ def get_house_detail(house_id):
 
 
     return jsonify(errno=RET.OK, errmsg='OK')
+
 
 '''上传房屋图片功能'''
 @api.route('/house/image', methods=['POST'])
