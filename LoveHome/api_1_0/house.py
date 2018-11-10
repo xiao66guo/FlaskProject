@@ -7,7 +7,7 @@ from LoveHome.models import Area, House, Facility, HouseImage
 from flask import jsonify, current_app, request, g, session
 from LoveHome.utils.response_code import RET
 from LoveHome.utils.common import login_required
-from LoveHome import db, constants
+from LoveHome import db, constants, redis_store
 from LoveHome.utils import image_storage
 
 
@@ -177,16 +177,32 @@ def add_house():
 '''获取所有的城区信息'''
 @api.route('/areas')
 def get_areas():
+
+    # 先从redis缓存中获取城区信息
+    try:
+        areas_dict_list = redis_store.get('Areas')
+        if areas_dict_list:
+            return jsonify(errno=RET.OK, errmsg='OK', data=eval(areas_dict_list))
+    except Exception as e:
+        current_app.logger.error(e)
+
     try:
         areas = Area.query.all()
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
+
     # 定义一个空列表，用于保存遍历时所转换的字典
     areas_dict_list = []
     # 模型转字典
     for area in areas:
         areas_dict_list.append(area.to_dict())
+
+    # 缓存城区信息到redis中
+    try:
+        redis_store.set('Areas', areas_dict_list, constants.AREA_INFO_REDIS_EXPIRES)
+    except Exception as e:
+        current_app.logger.error(e)
 
     return jsonify(errno=RET.OK, errmsg='OK', data=areas_dict_list)
 
