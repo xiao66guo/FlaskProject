@@ -10,6 +10,26 @@ from LoveHome.models import Order, House
 from LoveHome.utils.common import login_required
 from LoveHome import db
 
+'''获取当前登录用户的所有订单'''
+@api.route('/orders')
+@login_required
+def orders_list():
+    user_id = g.user_id
+    try:
+        orders = Order.query.filter(Order.user_id == user_id).all()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
+
+    # 订单的字典列表
+    order_dict_list = []
+    for order in orders:
+        order_dict_list.append(order.to_dict())
+
+    return jsonify(errno=RET.OK, errmsg='OK', data=order_dict_list)
+    pass
+
+
 
 '''添加新订单功能'''
 @api.route('/orders', methods=['POST'])
