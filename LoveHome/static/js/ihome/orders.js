@@ -19,7 +19,7 @@ $(document).ready(function(){
     $(window).on('resize', centerModals);
 
     // 查询房客订单
-    $.get('/api/v1.0/orders', function (resp) {
+    $.get('/api/v1.0/orders?role=custom', function (resp) {
         if (resp.errno == '0'){
             var html = template('orders-list-tmpl', {'orders': resp.data})
             $('.orders-list').html(html)

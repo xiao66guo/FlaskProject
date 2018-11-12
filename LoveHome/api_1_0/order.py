@@ -15,8 +15,23 @@ from LoveHome import db
 @login_required
 def orders_list():
     user_id = g.user_id
+    role = request.args.get('role')     # 如果 role=landlord 代表房东，否则是房客订单
+    if not role:
+        return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
+    if role not in('landlord', 'custom'):
+        return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
+
     try:
-        orders = Order.query.filter(Order.user_id == user_id).all()
+        if role == 'landlord':
+            # 查询房东的所有订单
+            pass
+            houses = House.query.filter(House.user_id == user_id).all()
+            # 获取房屋的id
+            houses_id = [house.id for house in houses]
+            orders = Order.query.filter(Order.house_id.in_(houses_id)).all()
+        elif role == 'custom':
+            # 查询房客的所有订单
+            orders = Order.query.filter(Order.user_id == user_id).all()
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
