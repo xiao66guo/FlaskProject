@@ -116,7 +116,7 @@ def create_order():
 
     # 3、判断当前房屋在当前时间段内是否被预定
     try:
-        conflict_orders_list = Order.query.filter(end_date > Order.begin_date, start_date < Order.end_date).all()
+        conflict_orders_list = Order.query.filter(end_date > Order.begin_date, start_date < Order.end_date, Order.house_id == house_id).all()
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg='查询数据错误')
