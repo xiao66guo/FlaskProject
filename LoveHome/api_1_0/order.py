@@ -15,6 +15,12 @@ from LoveHome import db
 @api.route('/orders/<order_id>', methods=['PUT'])
 @login_required
 def set_order_status(order_id):
+
+    # 获取对应的响应事件
+    action = request.args.get('action')
+    if action not in ('accept', 'reject'):
+        return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
+
     # 1、通过order_id找到对应的订单
     try:
         order = Order.query.filter(Order.id == order_id, Order.status == 'WAIT_ACCEPT').first()
@@ -32,7 +38,15 @@ def set_order_status(order_id):
         return jsonify(errno=RET.ROLEERR, errmsg='不允许修改订单状态')
 
     # 3、修改订单状态
-    order.status = 'WAIT_COMMENT'
+    if action == 'accept':
+        order.status = 'WAIT_COMMENT'
+    else:
+        order.status = 'REJECTED'
+        reason = request.json.get('reason')
+        if not reason:
+            return jsonify(errno=RET.PARAMERR, errmsg='请输入拒单的原因')
+        # 设置拒单原因
+        order.comment = reason
 
     # 4、更新数据库
     try:

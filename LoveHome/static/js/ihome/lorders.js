@@ -31,13 +31,11 @@ $(document).ready(function(){
             $('.modal-accept').on('click', function () {
                 var order_id = $(this).attr('order-id')
                 $.ajax({
-                    url: '/api/v1.0/orders/' + order_id,
+                    url: '/api/v1.0/orders/' + order_id + '?action=accept',
                     type: 'put',
-                    // contentType: 'application/json',
                     headers: {
                         'X-CSRFTOKEN': getCookie('csrf_token')
                     },
-                    // data: JSON.stringify(params),
                     success: function (resp) {
                         // 1. 设置订单状态的html
                             $(".orders-list>li[order-id="+ order_id +"]>div.order-content>div.order-text>ul li:eq(4)>span").html("已接单");
@@ -49,12 +47,36 @@ $(document).ready(function(){
                 })
             })
 
-
-
             $(".order-reject").on("click", function(){
-                var orderId = $(this).parents("li").attr("order-id");
+                var orderId = $(this).parents("li").attr("order-id")
                 $(".modal-reject").attr("order-id", orderId);
             });
+            $('.modal-reject').on('click', function () {
+                var order_id = $(this).attr('order-id')
+                // 拒单的原因
+                var reason = $('#reject-reason').val()
+                if (!reason){
+                    alert('请输入原因')
+                    return
+                }
+                $.ajax({
+                    url: '/api/v1.0/orders/' + order_id + '?action=reject',
+                    type: 'put',
+                    headers: {
+                        'X-CSRFTOKEN': getCookie('csrf_token')
+                    },
+                    data: JSON.stringify({'reason': reason}),
+                    contentType: 'application/json',
+                    success: function (resp) {
+                        // 1. 设置订单状态的html
+                            $(".orders-list>li[order-id="+ order_id +"]>div.order-content>div.order-text>ul li:eq(4)>span").html("已拒单");
+                            // 2. 隐藏接单和拒单操作
+                            $("ul.orders-list>li[order-id="+ order_id +"]>div.order-title>div.order-operate").hide();
+                            // 3. 隐藏弹出的框
+                            $("#reject-modal").modal("hide");
+                    }
+                })
+            })
         }else if (resp.errno == '4101'){
             location.href = '/'
         }else {
