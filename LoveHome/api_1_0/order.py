@@ -10,6 +10,42 @@ from LoveHome.models import Order, House
 from LoveHome.utils.common import login_required
 from LoveHome import db
 
+
+'''设置订单的状态'''
+@api.route('/orders/<order_id>', methods=['PUT'])
+@login_required
+def set_order_status(order_id):
+    # 1、通过order_id找到对应的订单
+    try:
+        order = Order.query.filter(Order.id == order_id, Order.status == 'WAIT_ACCEPT').first()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询数据错误')
+    if not order:
+        return jsonify(errno=RET.DBERR, errmsg='订单不存在')
+
+    # 2、判断当前登录用户是否是该订单对应房屋的房东
+    user_id = g.user_id
+    # 去当前订单对应的房东ID
+    landlord_id = order.house.user_id
+    if user_id != landlord_id:
+        return jsonify(errno=RET.ROLEERR, errmsg='不允许修改订单状态')
+
+    # 3、修改订单状态
+    order.status = 'WAIT_COMMENT'
+
+    # 4、更新数据库
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='修改订单状态失败')
+
+    return jsonify(errno=RET.OK, errmsg='OK')
+
+
+
 '''获取当前登录用户的所有订单'''
 @api.route('/orders')
 @login_required
@@ -43,7 +79,6 @@ def orders_list():
 
     return jsonify(errno=RET.OK, errmsg='OK', data=order_dict_list)
     pass
-
 
 
 '''添加新订单功能'''
@@ -106,6 +141,7 @@ def create_order():
         db.session.add(order)
         db.session.commit()
     except Exception as e:
+        db.session.rollback()
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg='保存订单失败')
 
