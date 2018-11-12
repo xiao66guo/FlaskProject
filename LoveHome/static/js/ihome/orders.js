@@ -23,6 +23,31 @@ $(document).ready(function(){
         if (resp.errno == '0'){
             var html = template('orders-list-tmpl', {'orders': resp.data})
             $('.orders-list').html(html)
+            // 查询成功之后需要设置评论的相关处理
+            $(".order-comment").on("click", function(){
+                var orderId = $(this).parents("li").attr("order-id");
+                $(".modal-comment").attr("order-id", orderId);
+            });
+            $('.modal-comment').on('click', function () {
+                var order_id = $(this).attr('order-id')
+                // 取出评论内容
+                var comment = $('#comment').val()
+                $.ajax({
+                    url: "/api/v1.0/orders/" + order_id + "/comment",
+                    type: 'post',
+                    contentType: 'application/json',
+                    headers: {
+                        'X-CSRFTOKEN': getCookie('csrf_token')
+                    },
+                    data: JSON.stringify({'comment': comment}),
+                    success: function (resp) {
+                        $(".orders-list>li[order-id="+ order_id +"]>div.order-content>div.order-text>ul li:eq(4)>span").html("已完成");
+                        $("ul.orders-list>li[order-id="+ order_id +"]>div.order-title>div.order-operate").hide();
+                        $("#comment-modal").modal("hide");
+                    }
+                })
+                
+            })
         }else if (resp.errno == '4101'){
             location.href = '/'
         }else {
@@ -30,9 +55,4 @@ $(document).ready(function(){
         }
     })
 
-    // TODO: 查询成功之后需要设置评论的相关处理
-    $(".order-comment").on("click", function(){
-        var orderId = $(this).parents("li").attr("order-id");
-        $(".modal-comment").attr("order-id", orderId);
-    });
 });

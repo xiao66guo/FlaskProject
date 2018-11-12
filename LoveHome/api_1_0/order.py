@@ -11,6 +11,41 @@ from LoveHome.utils.common import login_required
 from LoveHome import db
 
 
+
+'''订单评论功能'''
+@api.route('/orders/<order_id>/comment', methods=['POST'])
+@login_required
+def set_orders_comment(order_id):
+    # 获取参数
+    comment = request.json.get('comment')
+
+    if not comment:
+        return jsonify(errno=RET.PARAMERR, errmsg='参数错误')
+    # 通过order_id查询出指定的订单
+    try:
+        order = Order.query.filter(Order.id == order_id, Order.status == 'WAIT_COMMENT', Order.user_id == g.user_id).first()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
+
+    if not order:
+        return jsonify(errno=RET.NODATA, errmsg='未查询出对应的订单')
+    # 设置订单状态
+    order.status = 'COMPLETE'
+    order.comment = comment
+
+    # 保存订单
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='修改订单状态失败')
+
+    return jsonify(errno=RET.OK, errmsg='OK')
+
+
+
 '''设置订单的状态'''
 @api.route('/orders/<order_id>', methods=['PUT'])
 @login_required
@@ -57,7 +92,6 @@ def set_order_status(order_id):
         return jsonify(errno=RET.DBERR, errmsg='修改订单状态失败')
 
     return jsonify(errno=RET.OK, errmsg='OK')
-
 
 
 '''获取当前登录用户的所有订单'''

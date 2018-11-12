@@ -17,7 +17,7 @@ function getCookie(name) {
 $(document).ready(function(){
     $('.modal').on('show.bs.modal', centerModals);      //当模态框出现的时候
     $(window).on('resize', centerModals);
-    // TODO: 查询房东的订单
+    // 查询房东的订单
     $.get('/api/v1.0/orders?role=landlord', function (resp) {
         if (resp.errno == '0'){
             var html = template('orders-list-tmpl', {'orders': resp.data})
