@@ -49,7 +49,7 @@ $(document).ready(function () {
         })
     })
 
-    // TODO: 管理用户名修改的逻辑
+    // 管理用户名修改的逻辑
     $('#form-name').submit(function (e) {
         e.preventDefault()
         // 取用户输入的用户名

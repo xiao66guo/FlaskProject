@@ -112,7 +112,7 @@ $(document).ready(function() {
         $("#password2-err").hide();
     });
 
-    // TODO: 注册的提交(判断参数是否为空)
+    // 注册的提交(判断参数是否为空)
     $('.form-register').submit(function (e) {
         // 组织默认的提交操作
         e.preventDefault()
