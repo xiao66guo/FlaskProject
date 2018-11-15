@@ -19,6 +19,7 @@ class RET:
     IOERR               = "4302"
     SERVERERR           = "4500"
     UNKOWNERR           = "4501"
+    HOUSEBOOKED         = "4600"
 
 error_map = {
     RET.OK                    : u"成功",
@@ -39,4 +40,5 @@ error_map = {
     RET.IOERR                 : u"文件读写错误",
     RET.SERVERERR             : u"内部错误",
     RET.UNKOWNERR             : u"未知错误",
+    RET.HOUSEBOOKED           : u"房屋已被预定",
 }

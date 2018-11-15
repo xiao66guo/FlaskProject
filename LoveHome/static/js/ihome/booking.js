@@ -48,7 +48,7 @@ $(document).ready(function(){
         } else {
             var sd = new Date(startDate);
             var ed = new Date(endDate);
-            days = (ed - sd)/(1000*3600*24) + 1;
+            days = (ed - sd)/(1000*3600*24);
             var price = $(".house-text>p>span").html();
             var amount = days * parseFloat(price);
             $(".order-amount>span").html(amount.toFixed(2) + "(共"+ days +"晚)");
@@ -73,5 +73,36 @@ $(document).ready(function(){
         }
     })
 
-    // TODO: 订单提交
+    // 订单提交
+    $('.submit-btn').on('click', function () {
+        // 获取用户预订房间的开始时间和结束时间
+        var start_date = $('#start-date').val()
+        var end_date = $('#end-date').val()
+        if (!(start_date && end_date)){
+            alert('请选择时间')
+            return
+        }
+        var params = {
+            'house_id': houseId,
+            'start_date': start_date,
+            'end_date': end_date,
+        }
+        $.ajax({
+            url: '/api/v1.0/orders',
+            type: 'post',
+            contentType: 'application/json',
+            headers: {
+                'X-CSRFTOKEN': getCookie('csrf_token')
+            },
+            data: JSON.stringify(params),
+            success: function (resp) {
+                if (resp.errno == '0'){
+                    // 表示预订成功，跳转到订单列表页
+                    location.href = '/orders.html'
+                }
+            }
+        })
+    })
+
+
 })

@@ -3,11 +3,29 @@ __author__ = 'xiaoguo'
 
 from . import api
 from flask import session, current_app, jsonify, request, g
-from LoveHome.models import User
+from LoveHome.models import User, House
 from LoveHome.utils.response_code import RET
 from LoveHome.utils.image_storage import upload_image
 from LoveHome import db, constants
 from LoveHome.utils.common import login_required
+
+
+'''查询当前用户发布的所有房源'''
+@api.route('/user/houses')
+@login_required
+def get_user_houses():
+    try:
+        houses = House.query.filter(House.user_id == g.user_id).all()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询数据失败')
+    house_dict_list = []
+    for house in houses:
+        house_dict_list.append(house.to_basic_dict())
+
+    return jsonify(errno=RET.OK, errmsg='OK', data=house_dict_list)
+
+
 
 
 '''获取用户实名认证信息'''
