@@ -5,7 +5,7 @@ import qiniu
 
 access_key = "HeZNmLfeU5htH64ZK2YHBlXmOmXrAzKO-PeJMlZp"
 secret_key = "QAmgQNB6TTjAvdCXFIR_H22UmKrO5OEQvc5PKtaR"
-bucket_name = 'lovehome'
+bucket_name = 'ihome'
 
 '''上传图片到七牛云的方法'''
 def upload_image(data):
